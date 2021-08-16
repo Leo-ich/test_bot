@@ -18,14 +18,14 @@ TOKEN = app.config.get('API_TOKEN') or environ['API_TOKEN']
 
 @app.route('/users')
 def users():
-    param = {
-        'user_name': request.args.get('user_name', default='', type=str),
-        'last_name': request.args.get('last_name', default='', type=str),
-        'car_model': request.args.get('last_name', default='', type=str),
-        'year': request.args.get('last_name', default='', type=str),
-        'power': request.args.get('last_name', default='', type=str),
+    params = {
+        'user_name': request.args.get('user_name', default='%', type=str),
+        'last_name': request.args.get('last_name', default='%', type=str),
+        'car_model': request.args.get('car_model', default='%', type=str),
+        'year': request.args.get('year', default='%', type=str),
+        'power': request.args.get('power', default='%', type=str),
     }
-    result = db.get_users(param)
+    result = db.get_users(params)
     return result
 
 

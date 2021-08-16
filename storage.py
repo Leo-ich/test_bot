@@ -114,6 +114,29 @@ class PgStorage:
 
     @db_connect
     def get_version(self, cursor=None):
+        # ver = 12
         query = 'SELECT version()'
         cursor.execute(query)
         print(cursor.fetchall())
+
+    @db_connect
+    def get_users(self, cursor, params):
+        query = """
+            SELECT name, last_name, model, year, power
+            FROM users AS u, car AS c
+            WHERE u.name LIKE %s
+              AND u.last_name LIKE %s
+              AND c.model LIKE %s
+              AND c.year::VARCHAR(15) LIKE %s
+              AND c.power::VARCHAR(15) LIKE %s
+              AND u.id = c.user_id;
+        """
+        sql_param = [params['user_name'],
+                     params['last_name'],
+                     params['car_model'],
+                     params['year'],
+                     params['power']]
+        cursor.execute(query, sql_param)
+        result = cursor.fetchall()
+        return {'result': result}
+
