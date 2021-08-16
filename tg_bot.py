@@ -7,15 +7,14 @@ import datetime
 from telebot import TeleBot, logger
 
 from config import Config
+from storage import PgStorage
 
 logger.setLevel(logging.INFO)
 
 TOKEN = getattr(Config, 'API_TOKEN', '') or environ['API_TOKEN']
 bot = TeleBot(TOKEN)
+db = PgStorage(Config)
 
-# TODO save in file
-knownUsers = []
-userStep = {}
 
 commands = {  # command description used in the "help" command
     'start': 'Начать использование бота',
@@ -25,11 +24,11 @@ commands = {  # command description used in the "help" command
 
 
 def get_user_step(uid):
-    if uid in userStep:
-        return userStep[uid]
+    if uid in db.get_known_users():
+        return db.get_step(uid)
     else:
-        knownUsers.append(uid)
-        userStep[uid] = 0
+        db.add_user(uid, 0)
+        db.add_car(uid)
         print('Обнаружен новый пользователь, который не использовал \"/start\"')
         return 0
 
@@ -37,9 +36,9 @@ def get_user_step(uid):
 @bot.message_handler(commands=['start'])
 def cmd_start(msg):
     chat_id = msg.chat.id
-    if chat_id not in knownUsers:
-        knownUsers.append(chat_id)
-        userStep[chat_id] = 0
+    if chat_id not in db.get_known_users():
+        db.add_user(chat_id, 0)
+        db.add_car(chat_id)
         command_help(msg)
         command_new(msg)
     else:
@@ -65,7 +64,7 @@ def command_help(msg):
                      content_types=['text'])
 def command_new(msg):
     chat_id = msg.chat.id
-    userStep[chat_id] = 1
+    db.update_data('users', 'step', 1, 'id', chat_id)
     bot.send_message(chat_id, 'Ваше имя?')
 
 
@@ -77,7 +76,8 @@ def get_username(msg):
     if len(msg.text) >= 255:
         bot.send_message(chat_id, 'Имя должно быть короче 255 букв')
         return
-    userStep[chat_id] = 2
+    db.update_data('users', 'name', msg.text, 'id', chat_id)
+    db.update_data('users', 'step', 2, 'id', chat_id)
     bot.send_message(chat_id, 'Ваша фамилия?')
 
 
@@ -89,7 +89,8 @@ def get_last_name(msg):
     if len(msg.text) >= 255:
         bot.send_message(chat_id, 'Фамилия должна быть короче 255 букв')
         return
-    userStep[chat_id] = 3
+    db.update_data('users', 'last_name', msg.text, 'id', chat_id)
+    db.update_data('users', 'step', 3, 'id', chat_id)
     bot.send_message(chat_id, 'Марка вашего автомобиля?')
 
 
@@ -101,7 +102,8 @@ def get_car_model(msg):
     if len(msg.text) >= 255:
         bot.send_message(chat_id, 'Марка авто должна быть короче 255 букв')
         return
-    userStep[chat_id] = 4
+    db.update_data('car', 'model', msg.text, 'user_id', chat_id)
+    db.update_data('users', 'step', 4, 'id', chat_id)
     bot.send_message(chat_id, 'Год выпуска вашего автомобиля?')
 
 
@@ -119,7 +121,8 @@ def get_car_year(msg):
     if not (1970 <= int(msg.text) <= int(str(cur_year))):
         bot.send_message(chat_id, err_text)
         return
-    userStep[chat_id] = 5
+    db.update_data('car', 'year', msg.text, 'user_id', chat_id)
+    db.update_data('users', 'step', 5, 'id', chat_id)
     bot.send_message(chat_id, 'Мощность вашего автомобиля?')
 
 
@@ -135,7 +138,8 @@ def get_car_power(msg):
     if not (0 < int(msg.text) <= 2000):
         bot.send_message(chat_id, err_text)
         return
-    userStep[chat_id] = 6
+    db.update_data('car', 'power', msg.text, 'user_id', chat_id)
+    db.update_data('users', 'step', 6, 'id', chat_id)
     bot.send_message(chat_id, 'Спасибо за ответы, вам оформлен'
                               ' полис номер ХХХ. \n/help')
 
@@ -143,10 +147,10 @@ def get_car_power(msg):
 @bot.message_handler(func=lambda msg: True, content_types=['text'])
 def echo_message(msg):
     chat_id = msg.chat.id
-    userStep[chat_id] = 0
+    db.update_data('users', 'step', 0, 'id', chat_id)
     bot.send_message(chat_id, 'Сбой бота, жду новой команды')
     command_help(msg)
 
 
 if __name__ == '__main__':
-    bot.polling()
+    bot.polling(none_stop=True)

@@ -10,5 +10,8 @@ class Config(object):
     # WEBHOOK_SSL_PRIV = 'webhook_pkey.pem'  # Path to the ssl private key
 
     # set data base
-    # DB_CONFIG = {'host': 'localhost', 'port': 28015, }
-    # DB_NAME = {'db_bot': 'db_bot', 'db_api': 'data'}
+    DB_NAME = 'bot_db'
+    DB_USER_NAME = 'postgres'
+    DB_PASS = ''
+    DB_HOST = '192.168.1.3'
+    DB_PORT = 5432

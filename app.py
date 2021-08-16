@@ -7,11 +7,26 @@ from config import Config
 
 from telebot import types
 from tg_bot import bot
+from storage import PgStorage
 
 app = Flask(__name__)
 app.config.from_object(Config)
+db = PgStorage(Config)
 
 TOKEN = app.config.get('API_TOKEN') or environ['API_TOKEN']
+
+
+@app.route('/users')
+def users():
+    param = {
+        'user_name': request.args.get('user_name', default='', type=str),
+        'last_name': request.args.get('last_name', default='', type=str),
+        'car_model': request.args.get('last_name', default='', type=str),
+        'year': request.args.get('last_name', default='', type=str),
+        'power': request.args.get('last_name', default='', type=str),
+    }
+    result = db.get_users(param)
+    return result
 
 
 @app.route('/' + TOKEN, methods=['POST'])
