@@ -9,11 +9,21 @@ https://t.me/TzorTestBot
 
 Для запуска нужны переменные окружения DB_PASS, API_TOKEN, FLASK_APP и настройки
  подключения к базе в файле config.py
+ 
+Для работы через webhook создадим самоподписанный сертификат:
 
-Запуск бота:
-
-    python -m tg_bot.py
-
-Запуск API к базе:
+    # генерируем приватный ключ
+    openssl genrsa -out webhook_pkey.pem 2048
     
-    python -m flask run
+    # генерируем самоподписанный сертификат
+    openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem
+    # В "Common Name (eg, your name or your server's hostname)"
+    # следует указать IP адрес сервера или доменное имя сервера
+
+Сборка docker контейнера:
+
+    podman build -t telegram_bot:latest ./
+
+Запуск docker контейнера:
+    
+    podman run -d --rm -e API_TOKEN=  -e DB_PASS= -p 5000:5000 telegram_bot:latest

@@ -124,3 +124,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+/webhook_pkey.pem
+/webhook_cert.pem
