@@ -26,4 +26,4 @@ https://t.me/TzorTestBot
 
 Запуск docker контейнера:
     
-    podman run -d --rm -e API_TOKEN=  -e DB_PASS= -p 5000:5000 telegram_bot:latest
+    podman run -d --rm -e API_TOKEN=  -e DB_PASS= -p 5000:8443 telegram_bot:latest

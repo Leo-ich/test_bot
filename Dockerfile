@@ -41,6 +41,4 @@ COPY --chown=appuser ./ ./
 # Run the application
 ENTRYPOINT ["gunicorn", "app:app"]
 CMD ["--workers", "1", "--log-file", "-"]
-#ENTRYPOINT ["python", "-m"]
-#CMD ["flask", "run"]
 #CMD ["/usr/bin/env", "bash"]
