@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from os import environ
-
 from flask import Flask, request
 from config import Config
 
@@ -13,7 +11,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = PgStorage(Config)
 
-TOKEN = app.config.get('API_TOKEN') or environ['API_TOKEN']
+TOKEN = app.config.get('API_TOKEN')
 
 
 @app.route('/users')

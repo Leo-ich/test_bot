@@ -1,5 +1,4 @@
 from contextlib import closing
-from os import environ
 
 import psycopg2
 from psycopg2 import sql
@@ -20,7 +19,7 @@ class PgStorage:
             self._conn_params = {
                 "database": config.DB_NAME,
                 "user": config.DB_USER_NAME,
-                "password": getattr(config, 'DB_PASS', '') or environ['DB_PASS'],
+                "password": getattr(config, 'DB_PASS', ''),
                 "host": config.DB_HOST,
                 "port": config.DB_PORT,
             }
