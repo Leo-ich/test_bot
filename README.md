@@ -12,11 +12,14 @@ https://t.me/TzorTestBot
  
 Для работы через webhook создадим самоподписанный сертификат:
 
-    # генерируем приватный ключ
-    openssl genrsa -out webhook_pkey.pem 2048
     
-    # генерируем самоподписанный сертификат
-    openssl req -new -x509 -days 3650 -key webhook_pkey.pem -out webhook_cert.pem
+    # генерируем самоподписанный сертификат и приватный ключ
+    
+    openssl req -x509 -days 3650 -out webhook_cert.crt -keyout webhook_pkey.key \
+    -newkey rsa:2048 -nodes -sha256 \
+    -subj '/CN=tzortestbot.herokuapp.com' -extensions EXT -config <( \
+    printf "[dn]\nCN=tzortestbot.herokuapp.com\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:tzortestbot.herokuapp.com\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+    
     # В "Common Name (eg, your name or your server's hostname)"
     # следует указать IP адрес сервера или доменное имя сервера
 
@@ -26,4 +29,4 @@ https://t.me/TzorTestBot
 
 Запуск docker контейнера:
     
-    podman run -d --rm -e API_TOKEN=  -e DB_PASS= -p 5000:8443 telegram_bot:latest
+    podman run -d --rm --env-file .env -p 5000:8443 telegram_bot:latest

@@ -39,6 +39,6 @@ WORKDIR /home/appuser/app
 COPY --chown=appuser ./ ./
 
 # Run the application
-ENTRYPOINT ["gunicorn", "app:app"]
-CMD ["--workers", "1", "--log-file", "-"]
+ENTRYPOINT ["gunicorn"]
+CMD ["app:app", "--workers", "1", "--log-file", "-"]
 #CMD ["/usr/bin/env", "bash"]
