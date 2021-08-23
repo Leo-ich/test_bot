@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 from flask import Flask, request
-from config import Config
 
-from telebot import types
+from config import Config
 from tg_bot import bot
 from storage import PgStorage
 
