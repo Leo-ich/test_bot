@@ -22,8 +22,7 @@ class PgStorage:
                 "password": getattr(config, 'DB_PASS', ''),
                 "host": config.DB_HOST,
                 "port": config.DB_PORT,
-                "database_url": config.DATABASE_URL,
-                "sslmode": 'require',
+                "sslmode": 'prefer',
             }
         self._conn_params.update(kwargs)
         self.create_table()

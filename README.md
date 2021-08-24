@@ -1,32 +1,38 @@
-### Тестовый Telegram бот.
-Бот задаёт несколько вопросов и сохраняет ответы в базу.
+## Тестовый Telegram бот.
+
 https://t.me/TzorTestBot
 
-Требования:
+### Требования задания:
+
+Бот задаёт несколько вопросов и сохраняет ответы в базу.
  * Python 3.5
  * PostgresSQL без ORM
  * Метод для выборки из базы с фильтром по всем полям
 
-Для запуска нужны переменные окружения DB_PASS, API_TOKEN, FLASK_APP и настройки
+### Развёртывание:
+
+Для запуска нужно задать переменные окружения DB_PASS, API_TOKEN, и/или настройки
  подключения к базе в файле config.py
- 
-Для работы через webhook создадим самоподписанный сертификат:
 
-    
-    # генерируем самоподписанный сертификат и приватный ключ
-    
-    openssl req -x509 -days 3650 -out webhook_cert.crt -keyout webhook_pkey.key \
-    -newkey rsa:2048 -nodes -sha256 \
-    -subj '/CN=tzortestbot.herokuapp.com' -extensions EXT -config <( \
-    printf "[dn]\nCN=tzortestbot.herokuapp.com\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:tzortestbot.herokuapp.com\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
-    
-    # В "Common Name (eg, your name or your server's hostname)"
-    # следует указать IP адрес сервера или доменное имя сервера
+#### Запуск на Heroku:
 
-Сборка docker контейнера:
+создаём приложение и базу данных на heroku, затем
+
+    cd myapp
+    heroku login -i
+    heroku config:set API_TOKEN=xxxxxxx
+    heroku git:remote -a appname
+    heroku stack:set container -a appname
+    git push heroku master
+    
+Теперь переход на WEBHOOK_HOST включит вебхук режим бота.
+
+#### Локальная сборка docker контейнера:
 
     podman build -t telegram_bot:latest ./
 
-Запуск docker контейнера:
+#### Локальный запуск docker контейнера:
     
-    podman run -d --rm --env-file .env -p 5000:8443 telegram_bot:latest
+    podman run -it --rm --env-file .env -p 5000:8443 telegram_bot:latest
+    
+Теперь переход по адресу http://localhost:5000/ отключит вебхук режим бота.

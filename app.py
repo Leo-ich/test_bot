@@ -2,6 +2,8 @@
 
 from flask import Flask, request
 
+from telebot import types
+
 from config import Config
 from tg_bot import bot
 from storage import PgStorage
